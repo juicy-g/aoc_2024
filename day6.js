@@ -8,7 +8,7 @@ function printGrid(grid) {
 }
 
 (async () => {
-  const data = await fs.readFile("test.txt", { encoding: "utf-8" });
+  const data = await fs.readFile("day6_input.txt", { encoding: "utf-8" });
   let order = ["right", "down", "left"];
   let direction = "up";
   let grid = data.split("\n");
@@ -59,6 +59,7 @@ function printGrid(grid) {
       }
     }
     if (grid[row][col] == "X") {
+      path.push([row, col]);
       switch (direction) {
         case "up":
           row--;
@@ -104,27 +105,33 @@ function printGrid(grid) {
       (row === grid.length - 1 && direction === "down")
     ) {
       exit = true;
-      grid[row][col] = "*";
+      path.push([row, col]);
     }
   }
 
-  // printGrid(grid);
   // console.log(spaces + 1 + " " + direction);
   // console.log(`row: ${row} col: ${col}`);
-  console.log(path);
+  // console.log(path);
 
   // part 2
   row = initialRow;
   col = initialCol;
   grid2[row][col] = ".";
-  row--;
+  // printGrid(grid2);
   direction = "up";
   order = ["right", "down", "left"];
-  obstacles = 1;
+  let obstacles = [];
+  let loop = 0;
+
   path.forEach((coord) => {
     exit = false;
+    let iter = 0;
     grid2[coord[0]][coord[1]] = "#";
     while (!exit) {
+      if (iter++ > 130 * 130) {
+        obstacles.push(coord);
+        exit = true;
+      }
       if (grid2[row][col] == ".") {
         switch (direction) {
           case "up":
@@ -167,24 +174,37 @@ function printGrid(grid) {
       if (
         (col === 0 && direction === "left") ||
         (row === 0 && direction === "up") ||
-        (col === grid[0].length - 1 && direction === "right") ||
-        (row === grid.length - 1 && direction === "down")
+        (col === grid2[0].length - 1 && direction === "right") ||
+        (row === grid2.length - 1 && direction === "down")
       ) {
-        // exited the grid
-        exit = true;
-      }
-      if (row == coord[0] && col == coord[1]) {
-        obstacles++;
-        console.log("OBSTACLE AT", coord);
         exit = true;
       }
     }
 
+    // reset
+    loop = 0;
     row = initialRow;
     col = initialCol;
     direction = "up";
     order = ["right", "down", "left"];
     grid2[coord[0]][coord[1]] = ".";
   });
-  console.log(obstacles);
+
+  // remove duplicates
+  function multiDimensionalUnique(arr) {
+    var uniques = [];
+    var itemsFound = {};
+    for (var i = 0, l = arr.length; i < l; i++) {
+      var stringified = JSON.stringify(arr[i]);
+      if (itemsFound[stringified]) {
+        continue;
+      }
+      uniques.push(arr[i]);
+      itemsFound[stringified] = true;
+    }
+    return uniques;
+  }
+
+  let answer = multiDimensionalUnique(obstacles);
+  console.log(answer.length);
 })();
