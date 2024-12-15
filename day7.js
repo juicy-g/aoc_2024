@@ -28,7 +28,6 @@ const { open } = require("node:fs/promises");
 
     // 0 for +, 1 for *, and 2 for ||
     // [ '0', '1', '2'], [ '00', '01', '02', '10', '11'], etc.
-
     let combinedArray = [];
     combinations.forEach((combination) => {
       combinedArray.push(
@@ -50,18 +49,17 @@ const { open } = require("node:fs/promises");
           total = parseInt(total.toString().concat(array[i + 2].toString()));
         }
         if (total > values[index]) {
-          continue;
+          break;
         }
         i++;
       }
       if (total == values[index]) {
         answer.push(total);
-        continue;
+        return;
       }
     }
   });
-  // remove duplicate values
-  answer = [...new Set(answer)];
+
   const sum = answer.reduce((total, value) => total + value, 0);
   console.log(sum);
 })();
