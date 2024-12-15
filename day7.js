@@ -15,18 +15,19 @@ const { open } = require("node:fs/promises");
     equations.push(elements);
   }
 
-  equations.forEach((equation, i) => {
+  equations.forEach((equation, index) => {
     // find all possible combinations of operators based on equation length
     let combinations = [];
-    for (let i = 0; i < Math.pow(2, equation.length - 1); i++) {
-      let binaryString = i.toString(2);
+    for (let i = 0; i < Math.pow(3, equation.length - 1); i++) {
+      let binaryString = i.toString(3);
       while (binaryString.length < equation.length - 1) {
         binaryString = "0" + binaryString;
       }
       combinations.push(binaryString);
     }
-    // 0 for + and 1 for *
-    // [ '0', '1'], [ '00', '01', '10', '11'], etc.
+
+    // 0 for +, 1 for *, and 2 for ||
+    // [ '0', '1', '2'], [ '00', '01', '02', '10', '11'], etc.
 
     let combinedArray = [];
     combinations.forEach((combination) => {
@@ -38,20 +39,27 @@ const { open } = require("node:fs/promises");
       );
     });
 
-    combinedArray.forEach((array) => {
+    for (let array of combinedArray) {
       let total = array[0];
       for (let i = 0; i < array.length - 2; i++) {
         if (array[i + 1] == "0") {
           total += array[i + 2];
-        } else {
+        } else if (array[i + 1] == "1") {
           total *= array[i + 2];
+        } else {
+          total = parseInt(total.toString().concat(array[i + 2].toString()));
+        }
+        if (total > values[index]) {
+          continue;
         }
         i++;
       }
-      if (total == values[i]) answer.push(total);
-    });
+      if (total == values[index]) {
+        answer.push(total);
+        continue;
+      }
+    }
   });
-
   // remove duplicate values
   answer = [...new Set(answer)];
   const sum = answer.reduce((total, value) => total + value, 0);
